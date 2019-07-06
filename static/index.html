@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<title>温湿度检测</title>
+		<link rel="icon" type="image/x-icon" href="img/icon.ico" />
+		<link rel="stylesheet" href="static/layui/css/layui.css"  media="all">
+		<style>
+			.site-doc-icon li{width: 150px;}
+			.site-doc-icon li .layui-anim{width: 150px; height: 150px; line-height: 150px; margin: 0 auto 10px; text-align: center; background-color: #4876ff; cursor: pointer; color: #fff; border-radius: 50%; font-size:18px;}
+		</style>
+		<script src="static/echarts/echarts.min.js"></script>
+		<script type="text/javascript" src="static/js/jquery.min.js"></script>
+		<script type="text/javascript" src="static/layui/layui.js" charset="utf-8"></script>
+		<script src="static/js/update.js"></script>
+		
+		
+		
+	</head>
+		<body onload="startTime()">
+		 
+		 
+			<ul class="layui-nav">
+				<div class="layui-row">
+					<li class="layui-col-xs1" style="margin-left:25px;margin-top:5px;"><img src="static/image/thermometer2.png" width="25" height="45"></li>
+					<li class="layui-nav-item layui-col-xs1 active" ><a href="#" style="font-size:14px;">气象监测</a></li
+				</div>
+			</ul>
+			
+			
+			
+			
+			
+			
+			
+			<div style="padding: 20px; background-color: #F2F2F2;">
+			  <div class="layui-row layui-col-space15">
+			  
+			  
+				<!--时间、温湿度实时显示-->
+				<div class="layui-col-md6" >
+				  <div class="layui-card">
+					<div class="layui-card-header" style="font-size:18px;margin-left:10px;">实时温湿度</div>
+					<div class="layui-card-body">
+						<div class="layui-form">
+						  <table class="layui-table" style="margin:100px 0px;">
+							<tbody>
+							  <tr>
+								<td>
+									<center>
+										<ul class="site-doc-icon site-doc-anim">
+										  <li>
+											<div class="layui-anim" data-anim="layui-anim-scale">
+												<span><i class="fa fa-clock-o"></i></span><span id='txt'></span>
+											</div>
+											<div class="code" style="text-align:center;font-size:18px;">Time</div>
+										  </li>
+										</ul>
+									</center>
+								</td>
+								<td>
+									<center>
+										<ul class="site-doc-icon site-doc-anim">
+										  <li>
+											<div class="layui-anim" data-anim="layui-anim-scale">
+												<span><i class="fa fa-thermometer-half"></i>&nbsp;</span><span id='temp'>temperature</span>
+											</div>
+											<div class="code" style="text-align:center;font-size:18px;">Temperature</div>
+										  </li>
+										</ul>
+									</center>
+								</td>
+								<td>
+									<center>
+										<ul class="site-doc-icon site-doc-anim">
+										  <li>
+											<div class="layui-anim" data-anim="layui-anim-scale">
+												<span><i class="fa fa-tint"></i>&nbsp;</span><span id='hum'>humidity</span>
+											</div>
+											<div class="code" style="text-align:center;font-size:18px;">Humidity</div>
+										  </li>
+										</ul>
+									</center>
+								</td>
+							  </tr>
+							</tbody>
+						  </table>
+						</div>
+					</div>
+				  </div>
+				</div>
+				
+				
+				<div class="layui-col-md6">
+				  <div class="layui-card">
+					<div class="layui-card-header" style="font-size:18px;margin-left:10px;">未来一周气温变化</div>
+					<div class="layui-card-body">
+					    <div id="week-weather" style="height: 400px;length: 600px;"></div>
+						<script type="text/javascript">
+						function week_func()
+						{
+							var data_weather_high = [];
+							var data_weather_low = [];
+							
+							var dom = document.getElementById("week-weather");
+							var myChart = echarts.init(dom);
+							
+							$.ajax({
+								url: 'http://api.openweathermap.org/data/2.5/forecast?id=1791673&APPID=ccc28924096899cb20eb8f6f4f8936d4',
+								//dataType: "jsonp",
+								success: function (data_week) {
+									
+									var mark_date=data_week.list[0].dt_txt.substring(0,10);
+									var sum=data_week.list[0].main.temp_max-273.15+3;
+									var count=1;
+									for(var i = 1; i < data_week.cnt; i++){
+										var now_date=data_week.list[i].dt_txt.substring(0,10);
+										if(now_date!=mark_date){
+											data_weather_high.push((sum/count).toFixed(2));
+											sum=data_week.list[i].main.temp_max-273.15+3;
+											mark_date=now_date;
+											count=1;
+											//alert(mark_date);
+										}else{
+											sum=sum+data_week.list[i].main.temp_max-273.15+3;
+											count=count+1;
+										}
+									}
+									data_weather_high.push((sum/count).toFixed(2));
+										
+									var date_day = [];	
+									var mark_date=data_week.list[0].dt_txt.substring(0,10);
+									var sum=data_week.list[0].main.temp_min-273.15+3;
+									var count=1;
+									date_day.push(mark_date.substring(5,10));
+									for(var i = 1; i < data_week.cnt; i++){
+										var now_date=data_week.list[i].dt_txt.substring(0,10);
+										if(now_date!=mark_date){
+											data_weather_low.push((sum/count).toFixed(2));
+											sum=data_week.list[i].main.temp_min-273.15+3;
+											mark_date=now_date;
+											count=1;
+											date_day.push(mark_date.substring(5,10));
+											//alert(mark_date);
+										}else{
+											sum=sum+data_week.list[i].main.temp_min-273.15+3;
+											count=count+1;
+										}
+									}
+									data_weather_low.push((sum/count).toFixed(2));
+									
+									
+									myChart.setOption({
+										xAxis: {
+											data: date_day
+										},
+										series: [{
+											data: data_weather_high
+										},{
+											data: data_weather_low
+										}]
+									});
+								}
+							});
+							
+							var app = {};
+							var option = null;
+							option = {
+								title: {
+									text: '',
+									subtext: ''
+								},
+								tooltip: {
+									trigger: 'axis'
+								},
+								legend: {
+									data:['最高气温','最低气温']
+								},
+								toolbox: {
+									show: true,
+									feature: {
+										dataZoom: {
+											yAxisIndex: 'none'
+										},
+										dataView: {readOnly: false},
+										magicType: {type: ['line', 'bar']},
+										restore: {},
+										saveAsImage: {}
+									}
+								},
+								xAxis:  {
+									type: 'category',
+									boundaryGap: false,
+									data: []
+								},
+								yAxis: {
+									type: 'value',
+									scale: true,
+									axisLabel: {
+										formatter: '{value} °C'
+									}
+								},
+								series: [
+									{
+										name:'最高气温',
+										type:'line',
+										data:[],
+										markPoint: {
+											data: [
+												{type: 'max', name: '最大值'}
+											]
+										},
+										markLine: {
+											data: [
+												{type: 'average', name: '平均值'}
+											]
+										}
+									},
+									{
+										name:'最低气温',
+										type:'line',
+										data:[],
+										markPoint: {
+											data: [
+												{type: 'min', name: '最小值'}
+											]
+										},
+										markLine: {
+											data: [
+												{type: 'average', name: '平均值'},
+												[{
+													symbol: 'none',
+													x: '90%',
+													yAxis: 'max'
+												}, {
+													symbol: 'circle',
+													label: {
+														normal: {
+															position: 'start',
+															formatter: '最大值'
+														}
+													},
+													type: 'max',
+													name: '最高点'
+												}]
+											]
+										}
+									}
+								]
+							};
+							;
+							
+							if (option && typeof option === "object") {
+								myChart.setOption(option, true);
+							}
+						}
+						week_func()
+						</script>
+						
+					</div>
+				  </div>
+				</div>
+				
+				
+				<!--温度折线图-->
+				<div class="layui-col-md6">
+				  <div class="layui-card">
+					<div class="layui-card-header" style="font-size:18px;margin-left:10px;">历史温度</div>
+					<div class="layui-card-body">
+						<div id="temp-pic" style="height: 300px;"></div>
+					    <script type="text/javascript">
+							function toLocalTime(utc)
+							{
+								return new Date(utc + ' UTC')
+							}
+							function temp_func()
+							{
+							var dom = document.getElementById("temp-pic");
+							var myChart = echarts.init(dom);
+							var app = {};
+							var option = null;
+
+							var data = [];
+							$.ajax({
+								url: 'api/history',
+								success: function (history) {
+									for (var i = history.length - 1; i >= 0; i--) {
+										var d = toLocalTime(history[i][1])
+										data.push({
+											name:d.toString(),
+											value: [
+												d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + ((d.getMinutes()<10?'0':'') + d.getMinutes()) + ':' + ((d.getSeconds()<10?'0':'') + d.getSeconds()),
+												history[i][3]
+											]
+										});
+									}
+									myChart.setOption({
+										series: [{
+											data: data
+										}]
+									});
+								}
+							});
+
+
+							option = {
+								title: {
+									text: ''
+								},
+								tooltip: {
+									trigger: 'axis',
+									formatter: function (params) {
+										params = params[0];
+										var date = new Date(params.name);
+										return date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds() + ' : ' + params.value[1];
+									},
+									axisPointer: {
+										animation: false
+									}
+								},
+								xAxis: {
+									type: 'time',
+									splitLine: {
+										show: false
+									}
+								},
+								yAxis: {
+									type: 'value',
+									scale: true,
+									splitLine: {
+										show: false
+									}
+								},
+								series: [{
+									name: '模拟数据',
+									type: 'line',
+									showSymbol: false,
+									hoverAnimation: false,
+									data: []
+								}]
+							};
+
+							setInterval(function () {
+								$.ajax({
+									url: 'api/history?limit=1',
+									success: function (history) {
+										data.shift();
+										var d = toLocalTime(history[0][1])
+										data.push({
+											name:d.toString(),
+											value: [
+												d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + ((d.getMinutes()<10?'0':'') + d.getMinutes()) + ':' + ((d.getSeconds()<10?'0':'') + d.getSeconds()),
+												history[0][3]
+											]
+										});
+										myChart.setOption({
+											series: [{
+												data: data
+											}]
+										});
+									}
+								});
+							}, 10000);;
+							if (option && typeof option === "object") {
+								myChart.setOption(option, true);
+							}
+							}
+							temp_func()
+					    </script>
+					</div>
+				  </div>
+				</div>
+				
+				
+				<!--湿度折线图-->
+				<div class="layui-col-md6">
+				  <div class="layui-card">
+					<div class="layui-card-header" style="font-size:18px;margin-left:10px;">历史湿度</div>
+					<div class="layui-card-body">
+						<div id="hum-pic" style="height: 300px;"></div>
+						   <script type="text/javascript">
+						   function hum_func()
+						   {
+								var dom = document.getElementById("hum-pic");
+								var myChart = echarts.init(dom);
+								var app = {};
+								var option = null;
+								
+								var data = [];
+								$.ajax({
+									url: 'api/history',
+									success: function (history) {
+										for (var i = history.length - 1; i >= 0; i--) {
+											var d = toLocalTime(history[i][1])
+											data.push({
+												name:d.toString(),
+												value: [
+													d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + ((d.getMinutes()<10?'0':'') + d.getMinutes()) + ':' + ((d.getSeconds()<10?'0':'') + d.getSeconds()),
+													history[i][2]
+												]
+											});
+										}
+										myChart.setOption({
+											series: [{
+												data: data
+											}]
+										});
+									}
+								});
+
+								option = {
+									title: {
+										text: ''
+									},
+									tooltip: {
+										trigger: 'axis',
+										formatter: function (params) {
+											params = params[0];
+											var date = new Date(params.name);
+											return date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds() + ' : ' + params.value[1];
+										},
+										axisPointer: {
+											animation: false
+										}
+									},
+									xAxis: {
+										type: 'time',
+										splitLine: {
+											show: false
+										}
+									},
+									yAxis: {
+										type: 'value',
+										scale: true,
+										splitLine: {
+											show: false
+										}
+									},
+									series: [{
+										name: '模拟数据',
+										type: 'line',
+										showSymbol: false,
+										hoverAnimation: false,
+										//connectNulls: true,
+										data: []
+									}]
+								};
+
+								setInterval(function () {
+									$.ajax({
+										url: 'api/history?limit=1',
+										success: function (history) {
+											data.shift();
+											var d = toLocalTime(history[0][1])
+											data.push({
+												name:d.toString(),
+												value: [
+													d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + ((d.getMinutes()<10?'0':'') + d.getMinutes()) + ':' + ((d.getSeconds()<10?'0':'') + d.getSeconds()),
+													history[0][2]
+												]
+											});
+											myChart.setOption({
+												series: [{
+													data: data
+												}]
+											});
+										}
+									});
+								}, 10000);;
+								if (option && typeof option === "object") {
+									myChart.setOption(option, true);
+								}
+							}
+							hum_func();
+						   </script>
+					</div>
+				  </div>
+				</div>
+				
+				
+				
+				
+				
+				
+				<div class="layui-col-md12">
+				  <div class="layui-card">
+					<div class="layui-card-header">标题</div>
+					<div class="layui-card-body">
+					  内容
+					</div>
+				  </div>
+				</div>
+			  </div>
+			</div> 
+		<!-- 你的HTML代码 -->
+		
+		<script src="static/js/click.js"></script>
+	</body>
+</html>
