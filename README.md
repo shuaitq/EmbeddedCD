@@ -10,11 +10,11 @@ The function of weather.py:
 
 The function of bked.py:
 
-Open the flask serve, get the data and send it to the related api.
+  Open the flask serve, get the data and send it to the related api.
 
 The function of pyQTchart.py:
 
-Show the real-time temperature and humidity by using QT.
+  Show the real-time temperature and humidity by using QT.
 
 The picture of html:
 ![image](https://github.com/blacktion/EmbeddedCD/blob/master/effect-pictures/html.png?raw=true)
