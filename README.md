@@ -14,3 +14,4 @@ Open the flask serve, get the data and send it to the related api.
 The function of pyQTchart.py:
 Show the real-time temperature and humidity by using QT.
 
+![image](https://github.com/blacktion/EmbeddedCD/blob/master/effect-pictures/html.png?raw=true)
